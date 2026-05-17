@@ -1,5 +1,12 @@
 # News-Article Assignment
 
+## Tech Stack
+- React + TypeScript
+- Axios
+- Supabase (PostgreSQL)
+- React Router
+- Vite
+
 ## Requirements
 - Node.js
 - npm
@@ -20,9 +27,12 @@
 5. Open in browser
 - http://localhost:5173
 
-## Tech Stack
-- React + TypeScript
-- Axios
-- Supabase (PostgreSQL)
-- React Router
-- Vite
+## Features
+- Create new articles
+- Edit existing articles
+- Delete articles
+- Search articles
+- Pagination
+- Refresh button
+- Form validation
+- Data persistence with Supabase
