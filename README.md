@@ -20,7 +20,9 @@
 5. Open in browser
 - http://localhost:5173
 
-## Notes
-- This project uses LocalStorage for data persistence.
-- Axios is used to simulate a mock API structure.
-- No backend is required.
+## Tech Stack
+- React + TypeScript
+- Axios
+- Supabase (PostgreSQL)
+- React Router
+- Vite
