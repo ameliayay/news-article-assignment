@@ -1,35 +1,28 @@
 import axios from 'axios'
 import type { Article } from './article'
 
-axios.create({
-  baseURL: '/',
+// ── Connect to Supabase ──────────────────────────────────────
+const api = axios.create({
+  baseURL: `${import.meta.env.VITE_SUPABASE_URL}/rest/v1`,
+  headers: {
+    apikey:          import.meta.env.VITE_SUPABASE_ANON_KEY,
+    Authorization:  `Bearer ${import.meta.env.VITE_SUPABASE_ANON_KEY}`,
+    'Content-Type': 'application/json',
+    Prefer:         'return=representation',
+  },
 })
 
-const STORAGE_KEY = 'news_articles'
-
-// GET articles from localStorage
-function getStored(): Article[] {
-  const raw = localStorage.getItem(STORAGE_KEY)
-  return raw ? JSON.parse(raw) : []
-}
-
-// SAVE articles into localStorage
-function saveStored(articles: Article[]) {
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(articles))
-}
-
-// Seed demo data
-export function seedIfEmpty() {
-  if (getStored().length > 0) return
+// ── Seed demo data if table is empty ────────────────────────
+export async function seedIfEmpty() {
+  const { data } = await api.get<Article[]>('/articles?limit=1')
+  if (data.length > 0) return
 
   const now = new Date().toISOString()
-
-  saveStored([
+  await api.post('/articles', [
     {
       id: '1',
       title: 'Global Climate Summit Reaches Historic Agreement',
-      summary:
-        'World leaders at the UN Climate Summit have agreed to a landmark deal to reduce carbon emissions by 50% before 2035.',
+      summary: 'World leaders at the UN Climate Summit have agreed to a landmark deal to reduce carbon emissions by 50% before 2035.',
       date: '2026-05-10',
       publisher: 'Reuters',
       createdAt: now,
@@ -38,8 +31,7 @@ export function seedIfEmpty() {
     {
       id: '2',
       title: 'Breakthrough in Quantum Computing Announced',
-      summary:
-        'Researchers at MIT achieved a significant breakthrough in quantum computing.',
+      summary: 'Researchers at MIT achieved a significant breakthrough in quantum computing.',
       date: '2026-05-08',
       publisher: 'MIT Technology Review',
       createdAt: now,
@@ -48,42 +40,23 @@ export function seedIfEmpty() {
   ])
 }
 
-// FETCH articles
+// ── Fetch all articles ───────────────────────────────────────
 export async function fetchArticles(): Promise<Article[]> {
-  return getStored()
+  const { data } = await api.get<Article[]>('/articles?order=updatedAt.desc')
+  return data
 }
 
-// CREATE article
-export async function createArticle(
-  article: Article
-): Promise<void> {
-
-  const current = getStored()
-
-  saveStored([article, ...current])
+// ── Create a new article ─────────────────────────────────────
+export async function createArticle(article: Article): Promise<void> {
+  await api.post('/articles', article)
 }
 
-// UPDATE article
-export async function updateArticle(
-  id: string,
-  updatedArticle: Article
-): Promise<void> {
-
-  const updated = getStored().map((article) =>
-    article.id === id ? updatedArticle : article
-  )
-
-  saveStored(updated)
+// ── Update an existing article ───────────────────────────────
+export async function updateArticle(id: string, article: Article): Promise<void> {
+  await api.patch(`/articles?id=eq.${id}`, article)
 }
 
-// DELETE article
-export async function deleteArticle(
-  id: string
-): Promise<void> {
-
-  const filtered = getStored().filter(
-    (article) => article.id !== id
-  )
-
-  saveStored(filtered)
+// ── Delete an article ────────────────────────────────────────
+export async function deleteArticle(id: string): Promise<void> {
+  await api.delete(`/articles?id=eq.${id}`)
 }

@@ -83,8 +83,10 @@ function CreateArticlePage() {
         setSuccess('Article published!')
         setTitle(''); setSummary(''); setDate(''); setPublisher('')
       }
-    } catch {
-      setErrors({ submit: 'Something went wrong. Please try again.' })
+    } catch (err: any) {
+      console.error('❌ Submit error:', err)
+      console.error('❌ Error details:', err?.response?.data)
+      setErrors({ submit: err?.response?.data?.message || 'Something went wrong. Please try again.' })
     }
 
     setSubmitting(false)
